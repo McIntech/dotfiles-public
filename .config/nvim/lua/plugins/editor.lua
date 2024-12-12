@@ -67,6 +67,14 @@ return {
 				end,
 				desc = "Find Plugin File",
 			},
+			-- Agregar el mapeo <leader>bb para abrir buffers
+			{
+				"<leader>bb",
+				function()
+					require("telescope.builtin").buffers()
+				end,
+				desc = "List open buffers",
+			},
 			{
 				";f",
 				function()
@@ -89,44 +97,12 @@ return {
 				desc = "Search for a string in your current working directory and get results live as you type, respects .gitignore",
 			},
 			{
-				"\\\\",
-				function()
-					local builtin = require("telescope.builtin")
-					builtin.buffers()
-				end,
-				desc = "Lists open buffers",
-			},
-			{
 				";t",
 				function()
 					local builtin = require("telescope.builtin")
 					builtin.help_tags()
 				end,
 				desc = "Lists available help tags and opens a new window with the relevant help info on <cr>",
-			},
-			{
-				";;",
-				function()
-					local builtin = require("telescope.builtin")
-					builtin.resume()
-				end,
-				desc = "Resume the previous telescope picker",
-			},
-			{
-				";e",
-				function()
-					local builtin = require("telescope.builtin")
-					builtin.diagnostics()
-				end,
-				desc = "Lists Diagnostics for all open buffers or a specific buffer",
-			},
-			{
-				";s",
-				function()
-					local builtin = require("telescope.builtin")
-					builtin.treesitter()
-				end,
-				desc = "Lists Function names, variables, from Treesitter",
 			},
 			{
 				"sf",
