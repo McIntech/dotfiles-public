@@ -59,6 +59,13 @@ return {
 		},
 		keys = {
 			{
+				"<leader>fl",
+				function()
+					require("telescope.builtin").live_grep()
+				end,
+				desc = "Live Grep",
+			},
+			{
 				"<leader>fP",
 				function()
 					require("telescope.builtin").find_files({
