@@ -5,3 +5,14 @@ customCommands:
     context: "files"
     loadingText: "opening commitizen commit tool"
     subprocess: true
+
+keybinding:
+  universal:
+    quit: "q"
+    return: "<esc>"
+    scrollLeft: "h"
+    scrollRight: "l"
+    prevTab: "{"
+    nextTab: "}"
+    confirm: "<enter>"
+
