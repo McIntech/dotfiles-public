@@ -74,7 +74,6 @@ return {
 				end,
 				desc = "Find Plugin File",
 			},
-			-- Agregar el mapeo <leader>bb para abrir buffers
 			{
 				"<leader>bb",
 				function()
@@ -85,15 +84,9 @@ return {
 			{
 				"sf",
 				function()
-					local telescope = require("telescope")
-
-					local function telescope_buffer_dir()
-						return vim.fn.expand("%:p:h")
-					end
-
-					telescope.extensions.file_browser.file_browser({
+					require("telescope").extensions.file_browser.file_browser({
 						path = "%:p:h",
-						cwd = telescope_buffer_dir(),
+						cwd = require("telescope.utils").buffer_dir(),
 						respect_gitignore = false,
 						hidden = true,
 						grouped = true,
@@ -110,17 +103,60 @@ return {
 			local actions = require("telescope.actions")
 			local fb_actions = require("telescope").extensions.file_browser.actions
 
-			opts.defaults = vim.tbl_deep_extend("force", opts.defaults, {
-				wrap_results = true,
+			-- Configuración por defecto de Telescope
+			opts.defaults = vim.tbl_deep_extend("force", opts.defaults or {}, {
+				prompt_prefix = "> ",
+				selection_caret = "> ",
+				path_display = { "smart" },
 				layout_strategy = "horizontal",
-				layout_config = { prompt_position = "top" },
+				layout_config = {
+					prompt_position = "top",
+					horizontal = {
+						preview_width = 0.6, -- 60% del ancho para el preview
+					},
+					vertical = {
+						mirror = false,
+					},
+					width = 0.9, -- 90% del ancho total de la ventana
+					height = 0.8, -- 80% del alto total de la ventana
+				},
 				sorting_strategy = "ascending",
 				winblend = 0,
 				mappings = {
-					n = {},
+					i = {
+						["<C-j>"] = actions.move_selection_next,
+						["<C-k>"] = actions.move_selection_previous,
+						["<C-q>"] = actions.smart_send_to_qflist + actions.open_qflist,
+					},
+					n = {
+						["<C-j>"] = actions.move_selection_next,
+						["<C-k>"] = actions.move_selection_previous,
+						["<C-q>"] = actions.smart_send_to_qflist + actions.open_qflist,
+					},
+				},
+				preview = {
+					treesitter = true, -- Mejora el preview con Treesitter
 				},
 			})
-			opts.pickers = {
+
+			-- Configuración específica para los pickers
+			opts.pickers = vim.tbl_extend("force", opts.pickers or {}, {
+				live_grep = {
+					previewer = true, -- Asegura que el preview esté habilitado
+					layout_strategy = "horizontal",
+					layout_config = {
+						prompt_position = "top",
+						preview_width = 0.6,
+						width = 0.9,
+						height = 0.8,
+					},
+				},
+				find_files = {
+					previewer = true, -- Habilita el preview en find_files
+				},
+				buffers = {
+					previewer = false, -- Deshabilita el preview en buffers si lo prefieres
+				},
 				diagnostics = {
 					theme = "ivy",
 					initial_mode = "normal",
@@ -128,28 +164,27 @@ return {
 						preview_cutoff = 9999,
 					},
 				},
-			}
-			opts.extensions = {
+			})
+
+			-- Configuración de las extensiones
+			opts.extensions = vim.tbl_extend("force", opts.extensions or {}, {
 				file_browser = {
 					theme = "dropdown",
-					-- disables netrw and use telescope-file-browser in its place
 					hijack_netrw = true,
 					mappings = {
-						-- your custom insert mode mappings
 						["n"] = {
-							-- your custom normal mode mappings
 							["N"] = fb_actions.create,
 							["h"] = fb_actions.goto_parent_dir,
 							["/"] = function()
 								vim.cmd("startinsert")
 							end,
 							["<C-u>"] = function(prompt_bufnr)
-								for i = 1, 10 do
+								for _ = 1, 10 do
 									actions.move_selection_previous(prompt_bufnr)
 								end
 							end,
 							["<C-d>"] = function(prompt_bufnr)
-								for i = 1, 10 do
+								for _ = 1, 10 do
 									actions.move_selection_next(prompt_bufnr)
 								end
 							end,
@@ -158,10 +193,14 @@ return {
 						},
 					},
 				},
-			}
+			})
+
+			-- Inicializa Telescope con las opciones configuradas
 			telescope.setup(opts)
-			require("telescope").load_extension("fzf")
-			require("telescope").load_extension("file_browser")
+
+			-- Carga las extensiones necesarias
+			telescope.load_extension("fzf")
+			telescope.load_extension("file_browser")
 		end,
 	},
 }
